@@ -146,6 +146,10 @@ plt.savefig("Individual_spectra_y95.pdf")
 plt.show()
 
 
+#Some comments
+#dn_dE= Intensity
+
+
 
 
     
