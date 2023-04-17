@@ -175,7 +175,7 @@ plt.savefig("Individual_spectra_y95.pdf")
 plt.show()
 
 
-
+#Comments: Normalization is done in a bit different way, the values of the spectra are written in the output text file
 
 
 
