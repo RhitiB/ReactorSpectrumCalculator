@@ -149,11 +149,11 @@ def longest_sublist_with_max_value(lst):
     return longest_sublist
 my_list = E_anu_list
 longest_sublist = longest_sublist_with_max_value(my_list)
-print(len(longest_sublist))
+#print(len(longest_sublist))
 #print("Longest sublist with maximum value:", longest_sublist)
 
 #%%
-def create_subplots(list_of_sublists, x_values, endpoints,save_path):
+"""def create_subplots(list_of_sublists, x_values, endpoints,save_path):
     num_subplots = len(list_of_sublists)
     num_cols = 5
     num_rows = (num_subplots + num_cols - 1) // num_cols
@@ -178,13 +178,13 @@ def create_subplots(list_of_sublists, x_values, endpoints,save_path):
 list_of_sublists = matched_dn_dE
 x_values = longest_sublist
 save_path=('Subplots of Y95.png')
-create_subplots(list_of_sublists, x_values, endpoints, save_path)
+create_subplots(list_of_sublists, x_values, endpoints, save_path)"""
 
 #%%
 
 #-----Weighted Spectra----#
 
-weighted_spectra = []
+"""weighted_spectra = []
 
 for sublist in matched_dn_dE:
     weighted_sublist = [element * weight for element, weight in zip(sublist, BR)]
@@ -193,7 +193,7 @@ for sublist in matched_dn_dE:
 weighted_sum = [sum(sublist) for sublist in zip(*weighted_spectra)]
 matched_weighted_sum = weighted_sum + [0] * (len(longest_sublist) - len(weighted_sum))
 
-# print(matched_weighted_sum)
+print(matched_weighted_sum)"""
 
 
 #%%
