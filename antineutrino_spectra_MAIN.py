@@ -18,16 +18,15 @@ with open("End_BR_together.txt", "r") as file1:
     # print(BR)
     #print(columns)
 #%%
-E_e_list=[]
-
+E_e_list = []
 for i in range(len(endpoints)):
-    if endpoints[i]<511:
-        E_e = list(range(511, int(endpoints[i])+1, -1))
+    if endpoints[i] < 511:
+        E_e = list(range(511, int(endpoints[i])+1, -1))  # Values below 511 keV
     else:
-        E_e=list(range(511, int(endpoints[i])))
-        #print(E_e)
+        E_e = list(range(511, int(endpoints[i])))  # Values from 511 keV to 12000 keV
     E_e_list.append(E_e)
 #print(E_e_list)
+#%%
 
 E_e_new_list = []
 for sublist in E_e_list:
@@ -57,7 +56,7 @@ def integrand(E_nu, E_o):
     expr=((E_o-E_nu)**2-1)
     if expr < 0:
         return 0
-    denominator=math.sqrt(expr)* E_nu**2*(E_o-E_nu)
+    denominator=math.sqrt(expr)* (E_nu**2)*(E_o-E_nu)
     if denominator.imag != 0:
         return 0
     else:
@@ -93,67 +92,44 @@ for i in range(len(endpoints)):
     P=phase_space_norm[i]
     dn_dE_2=[]
     for j in range(len(P)):
-        dn_dE_2.append(C*BR[i]*K[i]*P[j]) # Multiply by the normalization constant K[i]
+        dn_dE_2.append((C*BR[i]*P[j])/K[i]) # Multiply by the normalization constant K[i]
     dn_dE_list_normalized.append(dn_dE_2)
 #print(dn_dE_list_normalized)
 
 #%%
 
-#Finding the maximum length of the lists: The calculation is done by finding the minimum length of each sublist
-#in both the E_anu_list and in the dn_dE_normalized_list
-def maximum_length(lst):
-    max_length = 0
+extended_E_anu_sublist = max(E_anu_list, key=len)
+#print(longest_sublist)
+extended_length = 12000
+num_missing_values = extended_length - len(extended_E_anu_sublist)
+#print(num_missing_values)
+#extended_E_anu_sublist = longest_sublist + [0] * num_missing_values
+longest_last_number= int(extended_E_anu_sublist[-1])
+print(range(longest_last_number+1, extended_length))
+extended_E_anu_sublist.extend(range(longest_last_number+1, extended_length))
+print(extended_E_anu_sublist)
+print("end of extended list")
+#%%
 
-    for sublist in lst:
-        length = len(sublist)
-        if length > max_length:
-            max_length = length
+#longest_dn_dE_sublist=max(dn_dE_list_normalized, key=len)
+#print(longest_dn_dE_sublist)
 
-    return max_length
-max_length_dn_dE = maximum_length(dn_dE_list_normalized)
-# print("Maximum dn_dE_sublist length:", max_length_dn_dE)
+matched_dn_dE = []
+for sublist in dn_dE_list_normalized:
+    if len(sublist) < len(extended_E_anu_sublist):
+        matched_sublist = sublist + [0] * (len(extended_E_anu_sublist) - len(sublist))
+        matched_dn_dE.append(matched_sublist)
+    elif len(sublist) > len(extended_E_anu_sublist):
+        matched_sublist = sublist[:len(extended_E_anu_sublist)]
+        matched_dn_dE.append(matched_sublist)
+    else:
+        matched_dn_dE.append(sublist)
+
+#print(matched_dn_dE)
 
 #%%
-#This is used to match the length of the sublists with zeros for adjusting the length of the arrays.
-def match_sublist_lengths(lst):
-    max_length = maximum_length(lst)
-    for sublist in lst:
-        while len(sublist) < max_length:
-            sublist.append(0)
-    return(lst)
-matched_dn_dE = match_sublist_lengths(dn_dE_list_normalized)
-# print((matched_dn_dE))
-#with open('output.txt', 'w') as file:
- #   for sublist in matched_dn_dE:
-  #      file.write(str(sublist)+ '\n')
-#for i, sublist in enumerate(matched_dn_dE):
-    #length = len(sublist)
-    #print("Length of sublist", i, ":", length)
-#for i in matched_dn_dE:
-    #print(matched_dn_dE[7])
 
-#%%
-#This is done seperately to find the longest sublist in the E_anu_list which can cover the maximum range of the
-#antineutrino spectra. This sublist is used for plotting the spectra for all the subplots with their respective endpoints.
-
-def longest_sublist_with_max_value(lst):
-    max_value = float('-inf')  # Initializing max_value as negative infinity
-    longest_sublist = []
-    for sublist in lst:
-        sublist_max = max(sublist)  # Find the maximum value in the sublist
-        if sublist_max > max_value:
-            max_value = sublist_max
-            longest_sublist = sublist
-        elif sublist_max == max_value and len(sublist) > len(longest_sublist):
-            longest_sublist = sublist
-    return longest_sublist
-my_list = E_anu_list
-longest_sublist = longest_sublist_with_max_value(my_list)
-#print(len(longest_sublist))
-#print("Longest sublist with maximum value:", longest_sublist)
-
-#%%
-"""def create_subplots(list_of_sublists, x_values, endpoints,save_path):
+def create_subplots(list_of_sublists, x_values, endpoints, save_path):
     num_subplots = len(list_of_sublists)
     num_cols = 5
     num_rows = (num_subplots + num_cols - 1) // num_cols
@@ -163,6 +139,7 @@ longest_sublist = longest_sublist_with_max_value(my_list)
 
     # Iterate over each sublist and create the corresponding subplot
     for i, sublist in enumerate(list_of_sublists):
+        print(i)
         row_index = i // num_cols  # Calculate the row index
         col_index = i % num_cols   # Calculate the column index
 
@@ -170,38 +147,22 @@ longest_sublist = longest_sublist_with_max_value(my_list)
         axs[row_index, col_index].set_ylabel("dn_dEnu")
         axs[row_index, col_index].set_xlabel("Antineutrino Energy (KeV)")
         axs[row_index, col_index].set_title("Endpoint {}".format(endpoints[i]))
+        axs[row_index, col_index].set_ylim(0, max(sublist) * 1.2)
+        # Uncomment the following lines if you want to set custom x-axis limits
+        # axs[row_index, col_index].set_xlim(min(x_values), max(x_values))
+        # if i == num_subplots - 1:
+        #     axs[row_index, col_index].set_xlim(min(x_values), max(x_values) * 0.8)
 
     plt.tight_layout()  # Adjust the spacing between subplots
-    plt.show()
+
+    # Save the plot before showing it
     plt.savefig(save_path)
+    plt.show()
 
 list_of_sublists = matched_dn_dE
-x_values = longest_sublist
-save_path=('Subplots of Y95.png')
-create_subplots(list_of_sublists, x_values, endpoints, save_path)"""
-
-#%%
-
-#-----Weighted Spectra----#
-
-"""weighted_spectra = []
-
-for sublist in matched_dn_dE:
-    weighted_sublist = [element * weight for element, weight in zip(sublist, BR)]
-    weighted_spectra.append(weighted_sublist)
-
-weighted_sum = [sum(sublist) for sublist in zip(*weighted_spectra)]
-matched_weighted_sum = weighted_sum + [0] * (len(longest_sublist) - len(weighted_sum))
-
-print(matched_weighted_sum)"""
-
-
-#%%
-# plt.plot(longest_sublist, matched_weighted_sum)
-# plt.show()
-
-
-
-
-
-
+x_values = extended_E_anu_sublist  # Use the correct x-values here
+endpoints = range(len(matched_dn_dE))  # Assuming endpoints are numbered from 1 to the number of subplots
+save_path = 'Subplots_of_Y95_new.png'
+create_subplots(list_of_sublists, x_values, endpoints, save_path)
+#print(len(x_values))
+#print(list_of_sublists[19])
