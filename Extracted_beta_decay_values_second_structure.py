@@ -1,5 +1,5 @@
 import os
-os.chdir(r"D:\Python_2\ENDF_FILE_READER")
+os.chdir(r"D:\Python_2\ENDF_FILE_READER\239Pu")
 import matplotlib.pyplot as plt
 import scipy.integrate as integrate
 from scipy.integrate import quad
@@ -8,7 +8,7 @@ import numpy as np
 
 #%%
 input_file = r"D:\Python_2\ENDF_FILE_READER\Elements_Matched_Data_1.txt"
-output_file = "Extracted_Elements_Beta_Decay_data_dsnnldsnclsc.txt"
+output_file = "Extracted_Elements_Beta_Decay_data_1.txt"
 start_extraction = False
 target_line_1 = "1.000000+0 1.000000+0"
 target_line_2 = "1.000000+0 2.000000+0"
@@ -79,5 +79,3 @@ with open(input_file, "r") as file_in, open(output_file, "w") as file_out:
             file_out.write(line)
 
         prev_line = line
-
-# The end of the 'with' block, the files are automatically closed.

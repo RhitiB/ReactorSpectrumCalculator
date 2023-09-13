@@ -1,5 +1,5 @@
 import os
-os.chdir(r"D:\Python_2\ENDF_FILE_READER")
+os.chdir(r"D:\Python_2\ENDF_FILE_READER\235U")
 import matplotlib.pyplot as plt
 import scipy.integrate as integrate
 from scipy.integrate import quad
@@ -7,8 +7,8 @@ import math
 import numpy as np
 import pprint
 #%%
-input_file = "Elements_Matched_Data_2.txt"
-output_file = "Extracted_Elements_Beta_Decay_data_xxx2_new.txt"
+input_file = "Elements_Matched_Data_3.txt"
+output_file = "Extracted_Elements_Beta_Decay_data_3.txt"
 start_extraction = False
 target_line_1 = "1.000000+0 1.000000+0"
 target_line_2 = "1.000000+0 2.000000+0"
@@ -87,25 +87,18 @@ with open(input_file, "r") as file_in, open(output_file, "w") as file_out:
 
 #%%
 cum_yield_dict = {}  # Cumulative yield for all the elements from the mother isotope
-
-# os.chdir("ENDF_FILE_READER")
-
-with open("Cum_Fission_241Pu.txt", "r") as input_file1:
+with open("Cum_Fission_235U.txt", "r") as input_file1:
     for line in input_file1:
         columns = line.split()
         if len(columns) >= 4:
             isotope_name = columns[0]
-            cum_yield_value = float(columns[3])
-            
-            element_name = isotope_name.split('-')[1]  # Extracting the element name
-            
+            cum_yield_value = float(columns[3])            
+            element_name = isotope_name.split('-')[1] # Extracting the element name            
             if element_name not in cum_yield_dict:
                 cum_yield_dict[element_name] = {}  # Creating a sub-dictionary if not already present
             
             cum_yield_dict[element_name][isotope_name] = cum_yield_value
-
 # Print the resulting dictionary for verification
-
 pprint.pprint(cum_yield_dict)
 print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
     
@@ -114,7 +107,7 @@ endpoints = []
 BR = []
 dict1 = {}
 dictBR = {}  # Dictionary for Branching Ratios
-with open("Extracted_Elements_Beta_Decay_data_xxx2_new.txt", "r") as input_file2:
+with open("Extracted_Elements_Beta_Decay_data_3.txt", "r") as input_file2:
     current_element_data = []
     current_BR_data = []
     element_name = None  # Initialize element_name
@@ -173,10 +166,10 @@ if current_element_data and element_name:
         dict1[str(element_name.split("-")[1])] = {}
     dict1[str(element_name.split("-")[1])][element_name] = current_element_data
 
-print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-print(dict1.get("Sr", "Key not found"))  # Check if 'Sr' key exists
-print(len(dict1))
-print(len(dictBR))
+# print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+# print(dict1.get("Sr", "Key not found"))  # Check if 'Sr' key exists
+# print(len(dict1))
+# print(len(dictBR))
 #%%                
 #Finding the energy list and range of values
 dict2={}
@@ -354,14 +347,12 @@ for key1_ext in dict3:
                 extended_E_anu_sublist.extend(range(longest_last_number + 1, extended_length + 1))
                 extended_sublists.append(extended_E_anu_sublist)
         extended_dict_3[key1_ext][key2_ext] = extended_sublists
-
 # Now, you can check the length of the extended sublists
 # print(len(extended_dict_3["Rb"]["37-Rb-98"][10]))
 
 #%%
 #--------Matching the dn_dE_normlaized dictionary. Here it should be kept in mind
 #-----------that the {dn_de_normalized{key1}{key2}[[Here individual sublists are getting extended not the whole dictionary]]}
-# Create a new dictionary to store the matched and extended dn_dE values
 # Create a new dictionary to store the matched and extended dn_dE values
 print("444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444")
 matched_dn_dE_dict = {}
@@ -400,24 +391,6 @@ for key1_norm in dn_de_normalized_dict:
         matched_dn_dE_dict[key1_norm][key2_norm] = extended_dn_de_sublists
 print(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::")
 #print(len(matched_dn_dE_dict["Co"]["27-Co-66"][0]))
-        
-"""matched_dn_dE_dict={}
-for key1 in dn_de_normalized_dict:
-    matched_dn_dE_dict[key1]={}
-    #print(matched_dn_dE_dict[key1])
-    for key2 in dn_de_normalized_dict[key1]:
-        extended_dn_de_sublists=[]
-        for lists in dn_de_normalized_dict[key1][key2]:
-            corresponding_sublist = dict3.get(key1, {}).get(key2, [])
-            #Finding the length of the longest sublist
-            max_len = max(len(sublist), max(len(sub) for sub in corresponding_sublist))
-            extended_sublist = sublist + [0] * (max_len - len(sublist))
-            
-            extended_dn_de_sublists.append(extended_sublist)
-        
-        matched_dn_dE_dict[key1][key2] = extended_dn_de_sublists
-
-# print(matched_dn_dE_dict)""" 
 #%%
 #print("28-Ni-66")
 #print(len(extended_dict_3["Ni"]["28-Ni-66"][0]))
@@ -433,7 +406,7 @@ for key1 in matched_dn_dE_dict:
             extended_dict_3[key1][key2][i] = [extended_dict_3[key1][key2][i][0]-1] + extended_dict_3[key1][key2][i]
             matched_dn_dE_dict[key1][key2][i] = [0] + matched_dn_dE_dict[key1][key2][i]
 #%%
-plot_dir = "Subplots_241Pu_BetaDecay_Antineutrinospectra_2"
+plot_dir = "Subplots_235U_BetaDecay_Antineutrinospectra_3"
 os.makedirs(plot_dir, exist_ok=True)
 
 for key1_norm in matched_dn_dE_dict:
@@ -451,7 +424,7 @@ for key1_norm in matched_dn_dE_dict:
             print("only one")
             plt.figure()
             plt.plot(extended_data[0], matched_data[0])
-            plt.xlabel("Extended Data")
+            plt.xlabel("Amtineutrino Energy(KeV)")
             plt.ylabel("Matched dn_dE Data")
             if endpoints:
                 endpoint_str = ', '.join([f"{endpoint} KeV" for endpoint in endpoints])
@@ -478,7 +451,7 @@ for key1_norm in matched_dn_dE_dict:
                 extended_sublist = extended_data[sublist_idx]
                 matched_sublist = matched_data[sublist_idx]                
                 ax.plot(extended_sublist, matched_sublist)
-                ax.set_xlabel("Extended Data")
+                ax.set_xlabel("Antineutrino Energy(KeV)")
                 ax.set_ylabel("Matched dn_dE Data")
                 if endpoints and len(endpoints) > sublist_idx:
                     ax.set_title(f"Endpoint: {endpoints[sublist_idx]} KeV")
@@ -493,4 +466,4 @@ for key1_norm in matched_dn_dE_dict:
             plt.close()
         else:
             print("Different length")
-print("Plots saved in the 'Subplots_241Pu_BetaDecay_Antineutrinospectra' directory.")
+print("Plots saved in the 'Subplots_235U_BetaDecay_Antineutrinospectra' directory.")
